@@ -1,0 +1,46 @@
+<head>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
+  <!--[if lte IE 8]>
+       <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.ie.css" />
+  <![endif]-->
+
+  <style>
+    #map { height: 480px; }
+  </style>
+</head>
+<body>
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>
+  <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+  <script src="http://underscorejs.org/underscore-min.js"></script>
+  
+  <div id="map"></div>
+  <div id="txt">text</div>
+  <script>
+    
+    var map = L.map('map').setView([43.07572, -89.38528], 13);
+    L.tileLayer('http://{s}.tile.cloudmade.com/06374E2EBDB94876A5809F68EA929231/997/256/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+      maxZoom: 18
+    }).addTo(map);
+     
+    $.get('bikes.json', function(kiosks) {
+      var mad_kiosks = _.filter(kiosks.d.list, function(k){ return k.Address.City == "Madison" });
+      var locs = _.map(mad_kiosks, function(k){ return [k.Location.Latitude, k.Location.Longitude] });
+      var kiosk_names = _.map(mad_kiosks, function(k){ return " " + k.Name });
+      
+      $('#txt').text(kiosk_names)
+      
+      var markers = _.map(locs, function(l){ 
+          return L.marker(l).addTo(map)
+      })
+      
+      for(i=0;i<markers.length;i++){
+        var nbikes = mad_kiosks[i].BikesAvailable 
+        var ndocks = mad_kiosks[i].DocksAvailable 
+        markers[i].bindPopup("<b>" + kiosk_names[i] + "</b><br> Bikes: " + nbikes + "<br> Docks: " + ndocks)
+        if(nbikes == 0)
+          markers[i].setOpacity(0.4)
+      }
+    })
+  </script>
+</body>
