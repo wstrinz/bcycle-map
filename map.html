@@ -3,9 +3,17 @@
   <!--[if lte IE 8]>
        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.ie.css" />
   <![endif]-->
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
   <style>
-    #map { height: 480px; }
+    body {
+        padding: 0;
+        margin: 0;
+    }
+    html, body, #map {
+        height: 100%;
+    }
   </style>
 </head>
 <body>
@@ -22,7 +30,9 @@
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
       maxZoom: 18
     }).addTo(map);
-     
+    
+    map.locate({setView: true, maxZoom: 16});
+
     $.get('bikes.json', function(kiosks) {
       var mad_kiosks = _.filter(kiosks.d.list, function(k){ return k.Address.City == "Madison" });
       var locs = _.map(mad_kiosks, function(k){ return [k.Location.Latitude, k.Location.Longitude] });
